@@ -1,6 +1,10 @@
 import { IMessageRepository } from "../ports/MessageRepository";
 import { IDateProvider } from "../ports/DateProvider";
 import { Message } from "../../domain/Message";
+import {
+  MessageTextEmpty,
+  MessageTextTooLong,
+} from "../../domain/MessageTextExceptions";
 
 export class PostMessageCommand {
   id: string;
@@ -18,6 +22,12 @@ export class PostMessageUseCase {
   }
 
   handle(postMessageCommand: PostMessageCommand) {
+    if (postMessageCommand.text.length > 280) {
+      throw new MessageTextTooLong();
+    }
+    if (postMessageCommand.text.trim().length === 0) {
+      throw new MessageTextEmpty();
+    }
     const message = new Message(
       postMessageCommand.id,
       postMessageCommand.text,
